@@ -1,10 +1,7 @@
-﻿using API.Requests;
-using Data.Commands;
-using Data.Handlers;
-using Data.Models;
-using Data.Queries;
+﻿using Data.Requests._Policy;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
+using API.RequestModels;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -23,9 +20,11 @@ namespace API.Controllers
 
         // GET: api/<PolicyController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IActionResult> Get()
         {
-            return new string[] { "value1", "value2" };
+            var query = new GetAllPoliciesQuery();
+            var result = await _mediator.Send(query);
+            return result is not null ? Ok(result) : NotFound();
         }
 
         // GET api/<PolicyController>/5
@@ -55,8 +54,19 @@ namespace API.Controllers
 
         // PUT api/<PolicyController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put(int id, [FromBody] UpdatePolicyRequest request)
         {
+            var query = new UpdatePolicyCommand(
+                id,
+                "ABCD-1234",
+                request.EffectiveDate,
+                request.PolicyTypeId,
+                request.PolicyStatusId,
+                request.CarrierId,
+                request.PaymentTermId
+            );
+            var result = await _mediator.Send(query);
+            return result ? Ok(result) : BadRequest();
         }
 
         // DELETE api/<PolicyController>/5

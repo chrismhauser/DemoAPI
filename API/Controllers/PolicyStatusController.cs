@@ -1,5 +1,4 @@
-﻿using Data.Commands;
-using Data.Queries;
+﻿using Data.Requests._PolicyStatus;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,9 +19,11 @@ namespace API.Controllers
 
         // GET: api/<PolicyStatusController>
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IActionResult> Get()
         {
-            return new string[] { "value1", "value2" };
+            var query = new GetAllPolicyStatusesQuery();
+            var result = await _mediator.Send(query);
+            return result is not null ? Ok(result) : NotFound();
         }
 
         // GET api/<PolicyStatusController>/5
@@ -45,8 +46,11 @@ namespace API.Controllers
 
         // PUT api/<PolicyStatusController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public async Task<IActionResult> Put(int id, [FromBody] string value)
         {
+            var query = new UpdatePolicyStatusCommand(id, value);
+            var result = await _mediator.Send(query);
+            return result ? Ok(result) : BadRequest();
         }
 
         // DELETE api/<PolicyStatusController>/5

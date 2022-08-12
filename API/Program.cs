@@ -1,5 +1,7 @@
 using Data.DataAccess;
+using Data.Handlers;
 using Data.Services;
+using Data.Services.Interfaces;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +23,7 @@ builder.Services.AddTransient<IPolicyTypeService, PolicyTypeService>();
 builder.Services.AddTransient<IPolicyStatusService, PolicyStatusService>();
 builder.Services.AddTransient<IPaymentTermService, PaymentTermService>();
 builder.Services.AddMediatR(typeof(DataContext).Assembly);
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
 
 var app = builder.Build();
 
